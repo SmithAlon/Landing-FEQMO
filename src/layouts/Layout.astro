@@ -1,79 +1,99 @@
 ---
-import Lenis from 'lenis'; 
 import '../styles/global.css';
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/public/FEQMO.jpg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>FEQMO</title>
-	</head>
-	<body>
-		<div>
-			<slot />
-		</div>
-	</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/Feqmo_sinfondo-Photoroom.png" />
+        <meta name="generator" content={Astro.generator} />
+        <title>FEQMO</title>
+    </head>
+    <body>
+        <main>
+            <slot />
+        </main>
+    </body>
 </html>
 
 <script>
-	import gsap from 'gsap';
-	import { ScrollTrigger } from 'gsap/ScrollTrigger';
-	import Lenis from 'lenis';
+    import gsap from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    import Lenis from 'lenis';
     
-    // Registrar el plugin
     gsap.registerPlugin(ScrollTrigger);
 
-    // Inicializar Lenis
-    const lenis = new Lenis()
+    const lenis = new Lenis();
 
-    // Vincular Lenis con GSAP
+    lenis.on('scroll', ScrollTrigger.update);
+
+    gsap.ticker.add((time) => {
+        lenis.raf(time * 1000); // Convert time from seconds to milliseconds
+    });
+
+    gsap.ticker.lagSmoothing(0);
+
     function raf(time: number) {
-        lenis.raf(time)
-        requestAnimationFrame(raf)
+        lenis.raf(time);
+        requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf)
-
-    // Actualizar ScrollTrigger en cada frame
-    lenis.on('scroll', ScrollTrigger.update)
-
-    // Ejemplo básico de GSAP
-    gsap.to('body > div', {
-        opacity: 1,
-        duration: 1,
-        ease: 'power2.out'
-    })
+    requestAnimationFrame(raf);
 </script>
 
 <style is:global>
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
-	}
+    :root {
+        --accent: 136, 58, 234;
+        --accent-light: 224, 204, 250;
+        --accent-dark: 49, 10, 101;
+        --accent-gradient: linear-gradient(
+            45deg,
+            rgb(var(--accent)),
+            rgb(var(--accent-light)) 30%,
+            white 60%
+        );
+    }
 
-	html {
-		font-family: system-ui, sans-serif;
-		background: #F4F4F4;
-		color: #636363;
-	}
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+    }
 
-	html,
-	body {
-		@apply grid place-content-center;
-	}
+    body {
+        font-family: system-ui, sans-serif;
+        background: #F4F4F4;
+        color: #636363;
+    }
 
-	body > div {
-		@apply container;
-	}
+    main {
+        width: 100%;
+        min-height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Estilo para la barra de scroll */
+    ::-webkit-scrollbar {
+        width: 8px;
+        position: absolute;
+        right: 0;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #0089CD;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #006b9e;
+    }
 </style>

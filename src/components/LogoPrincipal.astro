@@ -1,0 +1,95 @@
+---
+---
+
+<div class="min-h-screen flex flex-col items-center justify-center relative" id="mainContainer">
+    <div class="container mx-auto px-4 relative">
+        <div class="flex flex-row justify-center items-center gap-4 lg:gap-8">
+            <div class="flex flex-col items-center text-sm sm:text-base md:text-lg lg:text-xl z-10">
+                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Integridad</p>
+                <p class="valor opacity-0 translate-y-4 py-2 transition-all duration-300">Ética</p>
+                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Compromiso</p>
+            </div>
+            <!-- Logo central -->
+            <div id="logoContainer" class="flex flex-col content-center justify-center w-[45%] sm:w-[40%] md:w-[35%] lg:w-64 transition-all duration-500 items-center z-20">
+                <img 
+                    src="/Feqmo_sinfondo-Photoroom.png" 
+                    alt="FEQMO_logo"
+                    class="w-full max-w-[180px] lg:max-w-[200px] h-auto transition-all duration-300"
+                />
+                <h1 class="text-center text-[#0089CD] font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl mt-2">FEQMO</h1>
+            </div>
+            <div class="flex flex-col items-center text-sm sm:text-base md:text-lg lg:text-xl z-10">
+                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Cooperación</p>
+                <p class="valor opacity-0 translate-y-4 py-2 transition-all duration-300">Calidad</p>
+                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Seguridad</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    import { gsap } from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+    // Registrar el plugin
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Función para inicializar las animaciones
+    const initAnimations = () => {
+        // Animar los valores con efecto de scroll
+        const valores = document.querySelectorAll('.valor');
+        
+        // Timeline principal
+        const tl = gsap.timeline({
+            defaults: {
+                ease: "power2.out",
+                duration: 1
+            }
+        });
+
+        // Animar cada valor
+        valores.forEach((valor) => {
+            ScrollTrigger.create({
+                trigger: valor,
+                animation: gsap.from(valor, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1.5
+                }),
+                start: "top 80%",
+                end: "top 20%",
+                scrub: 1,
+                toggleActions: "play none none reverse"
+            });
+        });
+
+        // Animar el logo
+        const logo = document.querySelector('#logoContainer');
+        if (logo) {
+            ScrollTrigger.create({
+                trigger: logo,
+                animation: gsap.from(logo, {
+                    scale: 0.8,
+                    opacity: 0.5,
+                    duration: 2
+                }),
+                start: "top center",
+                end: "bottom center",
+                scrub: true
+            });
+        }
+    };
+
+    // Inicializar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAnimations);
+    } else {
+        initAnimations();
+    }
+</script>
+
+<style>
+    .valor {
+        will-change: opacity, transform;
+    }
+</style>
