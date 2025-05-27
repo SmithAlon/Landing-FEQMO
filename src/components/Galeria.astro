@@ -1,0 +1,120 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+const proyectos = await getCollection('proyectos');
+const proyectosRenderizados = await Promise.all(proyectos.map(async (proyecto: CollectionEntry<'proyectos'>) => {
+    const { nombre, ubicacion, imagen } = proyecto.data;
+    const { Content } = await proyecto.render();
+    return { nombre, ubicacion, imagen, Content };
+}));
+---
+
+<section class="w-full flex flex-col items-center justify-center px-4 py-6">
+    <h1 class="font-medium text-2xl text-[#111111] mb-2">Galeria de proyectos</h1>
+
+    <div class="w-full max-w-md mx-auto relative bg-white rounded-3xl shadow-lg overflow-hidden">
+        <div class="overflow-hidden">
+            <div id="slider" class="flex transition-transform duration-500 ease-in-out"
+                style={`width: ${proyectosRenderizados.length * 100}%`}>
+                {
+                    proyectosRenderizados.map(({ nombre, ubicacion, imagen, Content }) => (
+                        <div class="w-full flex-none" style="width: 100%">
+                            <div class="p-4">
+                                <img 
+                                    src={`/${imagen}`} 
+                                    alt={nombre}
+                                    class="w-full aspect-video object-cover rounded-xl shadow-md mb-4"
+                                />
+                                <h3 class="text-lg font-medium text-gray-900 mb-1">{nombre}</h3>
+                                <p class="text-sm text-gray-600 mb-2">{ubicacion}</p>
+                                <div class="prose prose-sm text-gray-700 leading-relaxed">
+                                    <Content />
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+        
+        <button id="prevBtn" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-all z-10">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+        </button>
+        
+        <button id="nextBtn" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-all z-10">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+        </button>
+
+        <div class="flex justify-center mt-4 pb-4 space-x-1.5">
+            {proyectosRenderizados.map((_, index) => (
+                <button
+                    class="dot w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-400 transition-all"
+                    data-index={index}
+                ></button>
+            ))}
+        </div>
+    </div>
+</section>
+
+<script>
+    let currentSlide = 0;
+    const slider = document.getElementById('slider') as HTMLElement | null;
+    const slides = document.querySelectorAll('#slider > div');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dots = document.querySelectorAll('.dot') as NodeListOf<HTMLButtonElement>;
+
+    // If any required element is missing, don't initialize the slider
+    if (!slider || !prevBtn || !nextBtn || slides.length === 0) {
+        console.warn('Some slider elements are missing');
+        throw new Error('Required slider elements not found');
+    }
+
+    function updateSlider() {
+        if (!slider) return;
+        
+        const offset = currentSlide * -100;
+        slider.style.transform = `translateX(${offset}%)`;
+        
+        // Update dots
+        dots.forEach((dot, index) => {
+            if (index === currentSlide) {
+                dot.classList.add('bg-blue-600');
+                dot.classList.remove('bg-gray-300');
+            } else {
+                dot.classList.remove('bg-blue-600');
+                dot.classList.add('bg-gray-300');
+            }
+        });
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % slides.length;
+        updateSlider();
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        updateSlider();
+    }
+
+    // Add click listeners
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    // Add dot click listeners
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentSlide = index;
+            updateSlider();
+        });
+    });
+
+    // Initialize the dots
+    updateSlider();
+</script>

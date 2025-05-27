@@ -5,9 +5,9 @@
     <div class="container mx-auto px-4 relative">
         <div class="flex flex-row justify-center items-center gap-4 lg:gap-8">
             <div class="flex flex-col items-center text-sm sm:text-base md:text-lg lg:text-xl z-10">
-                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Integridad</p>
-                <p class="valor opacity-0 translate-y-4 py-2 transition-all duration-300">Ética</p>
-                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Compromiso</p>
+                <p class="valor translate-y-4 transition-all duration-300">Integridad</p>
+                <p class="valor translate-y-4 py-1 transition-all duration-300">Ética</p>
+                <p class="valor translate-y-4 transition-all duration-300">Compromiso</p>
             </div>
             <!-- Logo central -->
             <div id="logoContainer" class="flex flex-col content-center justify-center w-[45%] sm:w-[40%] md:w-[35%] lg:w-64 transition-all duration-500 items-center z-20">
@@ -19,9 +19,9 @@
                 <h1 class="text-center text-[#0089CD] font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl mt-2">FEQMO</h1>
             </div>
             <div class="flex flex-col items-center text-sm sm:text-base md:text-lg lg:text-xl z-10">
-                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Cooperación</p>
-                <p class="valor opacity-0 translate-y-4 py-2 transition-all duration-300">Calidad</p>
-                <p class="valor opacity-0 translate-y-4 transition-all duration-300">Seguridad</p>
+                <p class="valor translate-y-4 transition-all duration-300">Cooperación</p>
+                <p class="valor translate-y-4 py-1 transition-all duration-300">Calidad</p>
+                <p class="valor translate-y-4 transition-all duration-300">Seguridad</p>
             </div>
         </div>
     </div>
@@ -36,46 +36,43 @@
 
     // Función para inicializar las animaciones
     const initAnimations = () => {
-        // Animar los valores con efecto de scroll
+        // Configuración de la animación para los valores
         const valores = document.querySelectorAll('.valor');
         
-        // Timeline principal
-        const tl = gsap.timeline({
-            defaults: {
-                ease: "power2.out",
-                duration: 1
-            }
-        });
+        valores.forEach((valor, index) => {
+            gsap.set(valor, { // Establecer estado inicial
+                opacity: 0,
+                y: 50
+            });
 
-        // Animar cada valor
-        valores.forEach((valor) => {
-            ScrollTrigger.create({
-                trigger: valor,
-                animation: gsap.from(valor, {
-                    opacity: 0,
-                    y: 50,
-                    duration: 1.5
-                }),
-                start: "top 80%",
-                end: "top 20%",
-                scrub: 1,
-                toggleActions: "play none none reverse"
+            gsap.to(valor, {
+                opacity: 2,
+                y: 0,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: valor,
+                    start: "top 80%",
+                    end: "top 20%",
+                    toggleActions: "play none none reverse",
+                    scrub: 1,
+                },
+                delay: index * 0.2 // Añadir delay secuencial
             });
         });
 
         // Animar el logo
         const logo = document.querySelector('#logoContainer');
         if (logo) {
-            ScrollTrigger.create({
-                trigger: logo,
-                animation: gsap.from(logo, {
-                    scale: 0.8,
-                    opacity: 0.5,
-                    duration: 2
-                }),
-                start: "top center",
-                end: "bottom center",
-                scrub: true
+            gsap.from(logo, {
+                scale: 0.8,
+                opacity: 0.5,
+                duration: 1.5,
+                scrollTrigger: {
+                    trigger: logo,
+                    start: "top center",
+                    end: "bottom center",
+                    scrub: true
+                }
             });
         }
     };
@@ -90,6 +87,6 @@
 
 <style>
     .valor {
-        will-change: opacity, transform;
+        will-change: transform;
     }
 </style>

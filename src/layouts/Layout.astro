@@ -7,7 +7,7 @@ import '../styles/global.css';
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/Feqmo_sinfondo-Photoroom.png" />
+        <link rel="icon" type="image/svg+xml" href="/FEQMO.jpg" />
         <meta name="generator" content={Astro.generator} />
         <title>FEQMO</title>
     </head>
@@ -25,7 +25,15 @@ import '../styles/global.css';
     
     gsap.registerPlugin(ScrollTrigger);
 
-    const lenis = new Lenis();
+    const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        smoothWheel: false,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+        infinite: false,
+    });
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -59,6 +67,16 @@ import '../styles/global.css';
     html, body {
         margin: 0;
         padding: 0;
+
+Integridad
+
+Ética
+
+Compromiso
+FEQMO_logo
+FEQMO
+
+Cooperación
         width: 100%;
         height: 100%;
         overflow-x: hidden;
