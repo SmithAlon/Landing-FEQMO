@@ -1,5 +1,5 @@
 ---
-nombre: "Prque Centro"
+nombre: "Parque Centro"
 ubicacion: "Saltillo, Coahuila"
 imagen: "ParqueCentro.png"
 ---

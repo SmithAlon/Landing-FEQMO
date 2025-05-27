@@ -1,120 +1,85 @@
 ---
 import { getCollection } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
-
 const proyectos = await getCollection('proyectos');
-const proyectosRenderizados = await Promise.all(proyectos.map(async (proyecto: CollectionEntry<'proyectos'>) => {
-    const { nombre, ubicacion, imagen } = proyecto.data;
-    const { Content } = await proyecto.render();
-    return { nombre, ubicacion, imagen, Content };
-}));
+
+// Render the content
+const renderedContent = await Promise.all(
+    proyectos.map(async (proyecto) => {
+        const { Content } = await proyecto.render();
+        return Content;
+    })
+);
 ---
 
-<section class="w-full flex flex-col items-center justify-center px-4 py-6">
-    <h1 class="font-medium text-2xl text-[#111111] mb-2">Galeria de proyectos</h1>
+<section class="flex flex-col mt-6 mb-6">
+    <div class="flex flex-col items-center justify-center mb-6">
+        <h2 class="font-bold text-3xl text-[#111111]">Galería de Proyectos</h2>
+        <div class="px-36 bg-[#222222] py-0.5 w-fit mt-1 rounded-md"></div>
+    </div>
 
-    <div class="w-full max-w-md mx-auto relative bg-white rounded-3xl shadow-lg overflow-hidden">
-        <div class="overflow-hidden">
-            <div id="slider" class="flex transition-transform duration-500 ease-in-out"
-                style={`width: ${proyectosRenderizados.length * 100}%`}>
-                {
-                    proyectosRenderizados.map(({ nombre, ubicacion, imagen, Content }) => (
-                        <div class="w-full flex-none" style="width: 100%">
-                            <div class="p-4">
-                                <img 
-                                    src={`/${imagen}`} 
-                                    alt={nombre}
-                                    class="w-full aspect-video object-cover rounded-xl shadow-md mb-4"
-                                />
-                                <h3 class="text-lg font-medium text-gray-900 mb-1">{nombre}</h3>
-                                <p class="text-sm text-gray-600 mb-2">{ubicacion}</p>
-                                <div class="prose prose-sm text-gray-700 leading-relaxed">
-                                    <Content />
+    <div class="flex items-center justify-between w-full max-w-lg mx-auto">
+        <button type="button" id="prevBtn" class="justify-center text-[#111111] text-xl font-semibold ml-2 hover:text-[#444444]">&lt;</button>
+            <div class="w-full max-w-4xl mx-auto px-4">
+                {proyectos.map((proyecto, index) => (
+                    <div data-proyecto class={`transition-opacity duration-500 ease-in-out ${index === 0 ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                        <h2 class="text-[#111111] text-center text-2xl font-semibold">{proyecto.data.nombre}</h2>
+                        <p class="text-center text-sm">{proyecto.data.ubicacion}</p>
+                        <div class="relative w-full aspect-[3/2] mt-4">
+                            <img 
+                                src={proyecto.data.imagen} 
+                                alt="imagen del proyecto" 
+                                class="absolute w-full h-full object-cover shadow-xl rounded-lg"
+                            />
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <span class="prose bg-[#E6E13B]/90 max-w-[80%] text-center text-base sm:text-sm md:text-md lg:text-lg font-light text-[#111111] px-0">
+                                        {index < renderedContent.length && 
+                                            (() => {
+                                                const Content = renderedContent[index];
+                                                return <Content />;
+                                            })()
+                                        }
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                    ))
-                }
+                    </div>
+                ))}
             </div>
-        </div>
-        
-        <button id="prevBtn" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-all z-10">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-        </button>
-        
-        <button id="nextBtn" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-all z-10">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
-        </button>
-
-        <div class="flex justify-center mt-4 pb-4 space-x-1.5">
-            {proyectosRenderizados.map((_, index) => (
-                <button
-                    class="dot w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-400 transition-all"
-                    data-index={index}
-                ></button>
-            ))}
-        </div>
+        <button type="button" id="nextBtn" class="text-[#111111] text-xl font-semibold mr-2 hover:text-[#444444]">&gt;</button>
     </div>
 </section>
 
 <script>
-    let currentSlide = 0;
-    const slider = document.getElementById('slider') as HTMLElement | null;
-    const slides = document.querySelectorAll('#slider > div');
+    let current = 0;
+    const proyectos = document.querySelectorAll('[data-proyecto]');
+    
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const dots = document.querySelectorAll('.dot') as NodeListOf<HTMLButtonElement>;
 
-    // If any required element is missing, don't initialize the slider
-    if (!slider || !prevBtn || !nextBtn || slides.length === 0) {
-        console.warn('Some slider elements are missing');
-        throw new Error('Required slider elements not found');
-    }
-
-    function updateSlider() {
-        if (!slider) return;
+    function animateTransition(from: Element, to: Element) {
+        from.classList.add('opacity-0');
         
-        const offset = currentSlide * -100;
-        slider.style.transform = `translateX(${offset}%)`;
+        setTimeout(() => {
+            from.classList.add('hidden');
+            to.classList.remove('hidden');
+            setTimeout(() => {
+                to.classList.remove('opacity-0');
+            }, 100);
+        }, 300);
+    }
+
+    prevBtn?.addEventListener('click', () => {
+        const oldProject = proyectos[current];
+        current = (current + 1) % proyectos.length;
+        animateTransition(oldProject, proyectos[current]);
+    });
         
-        // Update dots
-        dots.forEach((dot, index) => {
-            if (index === currentSlide) {
-                dot.classList.add('bg-blue-600');
-                dot.classList.remove('bg-gray-300');
-            } else {
-                dot.classList.remove('bg-blue-600');
-                dot.classList.add('bg-gray-300');
-            }
-        });
-    }
-
-    function nextSlide() {
-        currentSlide = (currentSlide + 1) % slides.length;
-        updateSlider();
-    }
-
-    function prevSlide() {
-        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-        updateSlider();
-    }
-
-    // Add click listeners
-    prevBtn.addEventListener('click', prevSlide);
-    nextBtn.addEventListener('click', nextSlide);
-
-    // Add dot click listeners
-    dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            currentSlide = index;
-            updateSlider();
-        });
+    nextBtn?.addEventListener('click', () => {
+        const oldProject = proyectos[current];
+        current = (current - 1 + proyectos.length) % proyectos.length;
+        animateTransition(oldProject, proyectos[current]);
     });
 
-    // Initialize the dots
-    updateSlider();
+    // Initial display is handled by template rendering
 </script>
