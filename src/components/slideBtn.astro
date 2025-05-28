@@ -1,12 +1,16 @@
 ---
-
+import Opciones from './Opciones.astro';
 ---
 
 <div class="flex flex-col items-center justify-center ">
     <button 
-    class="hover:opacity-80 transition-opacity cursor-pointer" 
+        id="openMenu"
+        aria-label="Abrir menú"
+        role="button"
+        class="hover:opacity-80 transition-opacity cursor-pointer z-50" 
     >
         <div class="w-fit py-1.5 px-5 mb-1 bg-[#0089CD] h-1/2 rounded-lg"></div>
         <div class="w-fit py-1.5 px-5 bg-[#0089CD] h-1/2 rounded-lg"></div>
     </button>
+    <Opciones />
 </div>

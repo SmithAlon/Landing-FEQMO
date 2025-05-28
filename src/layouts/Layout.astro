@@ -7,7 +7,7 @@ import '../styles/global.css';
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/FEQMO.jpg" />
+        <link rel="icon" type="image/svg+xml" href="/Feqmo_FBlanco-Photoroom.png" />
         <meta name="generator" content={Astro.generator} />
         <title>FEQMO</title>
     </head>
@@ -18,37 +18,44 @@ import '../styles/global.css';
     </body>
 </html>
 
-<script>
-    import gsap from 'gsap';
-    import { ScrollTrigger } from 'gsap/ScrollTrigger';
-    import Lenis from 'lenis';
-    
-    gsap.registerPlugin(ScrollTrigger);
+<script is:inline>
+  // Asegurarnos que el script se ejecute después de que el DOM esté listo
+  document.addEventListener('DOMContentLoaded', function() {
+    // Importar módulos de manera dinámica para asegurar que estén disponibles
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+      import('lenis')
+    ]).then(([gsap, { ScrollTrigger }, { default: Lenis }]) => {
+      // Registrar el plugin de ScrollTrigger
+      gsap.default.registerPlugin(ScrollTrigger);
 
-    const lenis = new Lenis({
+      // Inicializar Lenis
+      const lenis = new Lenis({
         duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        orientation: 'vertical',
-        smoothWheel: false,
+        smoothWheel: true,
         wheelMultiplier: 1,
         touchMultiplier: 2,
-        infinite: false,
-    });
+      });
 
-    lenis.on('scroll', ScrollTrigger.update);
+      // Hacer Lenis disponible globalmente
+      window.lenis = lenis;
 
-    gsap.ticker.add((time) => {
-        lenis.raf(time * 1000); // Convert time from seconds to milliseconds
-    });
+      // Conectar Lenis con GSAP
+      lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.lagSmoothing(0);
-
-    function raf(time: number) {
+      // Función de animación
+      function raf(time) {
         lenis.raf(time);
         requestAnimationFrame(raf);
-    }
+      }
+      requestAnimationFrame(raf);
 
-    requestAnimationFrame(raf);
+      console.log('Lenis initialized successfully');
+    }).catch(error => {
+      console.error('Error initializing scroll:', error);
+    });
+  });
 </script>
 
 <style is:global>
@@ -67,16 +74,6 @@ import '../styles/global.css';
     html, body {
         margin: 0;
         padding: 0;
-
-Integridad
-
-Ética
-
-Compromiso
-FEQMO_logo
-FEQMO
-
-Cooperación
         width: 100%;
         height: 100%;
         overflow-x: hidden;
@@ -84,14 +81,16 @@ Cooperación
 
     body {
         font-family: system-ui, sans-serif;
-        background: #F4F4F4;
-        color: #636363;
+        background-color: #F4F4F4;
+        background-image: radial-gradient(#aaaaaa 1.45px, transparent 1.45px), 
+                         radial-gradient(#F4F4F4 1.45px, #F4F4F4 1.45px);
+        background-size: 58px 58px;
+        background-position: 0 0, 29px 29px;
     }
 
     main {
         width: 100%;
         min-height: 100vh;
-        overflow-y: auto;
         overflow-x: hidden;
     }
 </style>

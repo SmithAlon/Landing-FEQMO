@@ -1,0 +1,102 @@
+---
+const menuItems = [
+  { label: 'Inicio', href: '#inicio' },
+  { label: 'Misión | Visión', href: '#mision-vision' },
+  { label: 'Proyectos', href: '#proyectos' },
+  { label: 'Fabricaciones', href: '#fabricaciones' },
+  { label: 'Contacto', href: '#contacto' }
+];
+---
+
+<div id="menu" class="fixed top-0 right-[-100%] w-64 h-screen bg-[#66B2FF] z-50 transition-all duration-300 ease-in-out">
+  <button id="closeMenu" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center">
+    <div class="w-6 h-[2px] bg-white absolute rotate-45"></div>
+    <div class="w-6 h-[2px] bg-white absolute -rotate-45"></div>
+  </button>
+  <nav class="pt-16 px-6">
+    <ul class="space-y-4">
+      {
+        menuItems.map(item => (
+          <li>
+            <a
+              href={item.href}
+              class="text-white text-lg hover:text-gray-200 block py-2 menu-link"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const menu = document.getElementById('menu');
+    const closeBtn = document.getElementById('closeMenu');
+    const openBtn = document.getElementById('openMenu');
+    const menuLinks = document.querySelectorAll('.menu-link');
+
+    // Funciones auxiliares
+    function closeMenu() {
+      menu?.classList.remove('right-0');
+      menu?.classList.add('right-[-100%]');
+    }
+
+    function scrollToElement(element, offset = -60) {
+      if (!window.lenis) {
+        console.warn('Lenis not initialized');
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+
+      window.lenis.scrollTo(element, { 
+        offset: offset,
+        duration: 1.2,
+        immediate: false
+      });
+    }
+
+    // Event Listeners
+    openBtn?.addEventListener('click', () => {
+      menu?.classList.remove('right-[-100%]');
+      menu?.classList.add('right-0');
+    });
+
+    closeBtn?.addEventListener('click', closeMenu);
+
+    menuLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const targetId = href.replace('#', '');
+        const targetElement = document.getElementById(targetId);
+        
+        if (!targetElement) {
+          console.warn(`Element with id ${targetId} not found`);
+          return;
+        }
+
+        // Primero cerrar el menú
+        closeMenu();
+
+        // Luego hacer el scroll con un pequeño delay
+        setTimeout(() => {
+          scrollToElement(targetElement);
+        }, 300);
+      });
+    });
+  });
+</script>
+
+<style is:global>
+  /* Mejoras de rendimiento */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+</style>
