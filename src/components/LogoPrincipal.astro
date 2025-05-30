@@ -4,13 +4,13 @@
 <div class="min-h-screen flex flex-col items-center justify-center relative" id="mainContainer">
     <div class="container mx-auto px-4 relative">
         <div class="flex flex-row justify-center items-center gap-4 lg:gap-8">
-            <div class="flex flex-col items-center text-sm sm:text-base md:text-lg lg:text-xl z-10">
-                <p class="valor translate-y-4 transition-all duration-300">Integridad</p>
-                <p class="valor translate-y-4 py-1 transition-all duration-300">Ética</p>
-                <p class="valor translate-y-4 transition-all duration-300">Compromiso</p>
+            <div id="izquierda" class="flex flex-col items-center text-[#222222] text-sm sm:text-base md:text-lg lg:text-xl z-10">
+                <p class="valor split">Integridad</p>
+                <p class="valor split py-1">Ética</p>
+                <p class="valor split">Compromiso</p>
             </div>
             <!-- Logo central -->
-            <div id="logoContainer" class="flex flex-col content-center justify-center w-[45%] sm:w-[40%] md:w-[35%] lg:w-64 transition-all duration-500 items-center z-20">
+            <div id="logoContainer" class="flex flex-col content-center mt-6 justify-center w-[45%] sm:w-[40%] md:w-[35%] lg:w-64 transition-all duration-500 items-center z-20">
                 <img 
                     src="/Feqmo_sinfondo-Photoroom.png" 
                     alt="FEQMO_logo"
@@ -18,75 +18,115 @@
                 />
                 <h1 class="text-center text-[#0089CD] font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl mt-2">FEQMO</h1>
             </div>
-            <div class="flex flex-col items-center text-sm sm:text-base md:text-lg lg:text-xl z-10">
-                <p class="valor translate-y-4 transition-all duration-300">Cooperación</p>
-                <p class="valor translate-y-4 py-1 transition-all duration-300">Calidad</p>
-                <p class="valor translate-y-4 transition-all duration-300">Seguridad</p>
+            <div id="derecha" class="flex flex-col text-[#222222] items-center text-sm sm:text-base md:text-lg lg:text-xl z-10">
+                <p class="valor split">Cooperación</p>
+                <p class="valor split py-1">Calidad</p>
+                <p class="valor split">Seguridad</p>
             </div>
+        </div>
+        <div class="text-center mt-4">
+            <p id="descrip" class="descripcion prose split text-md mx-auto max-w-[600px] px-8 whitespace-normal">
+                Una empresa dedicada a la fabricación de estructuras metálicas, maquinado y pailería.
+            </p>
         </div>
     </div>
 </div>
 
 <script>
     import { gsap } from 'gsap';
-    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    import { SplitText } from 'gsap/SplitText';
 
-    // Registrar el plugin
-    gsap.registerPlugin(ScrollTrigger);
+    const logo = document.querySelector('#logoContainer');
+    if (logo) {
+        gsap.from(logo, {
+            scale: 2,
+            opacity: 0,
+            duration: 1,
+            ease: "bounce.Out",
+            onComplete: () => {
+                gsap.registerPlugin(SplitText);
+                let completedAnimations = 0;
+                const totalAnimations = 6; // 3 valores por cada lado
 
-    // Función para inicializar las animaciones
-    const initAnimations = () => {
-        // Configuración de la animación para los valores
-        const valores = document.querySelectorAll('.valor');
-        
-        valores.forEach((valor, index) => {
-            gsap.set(valor, { // Establecer estado inicial
-                opacity: 0,
-                y: 50
-            });
+                const animateDescription = () => {
+                    if (completedAnimations === totalAnimations) {
+                        gsap.set("#descrip", { opacity: 1 });
+                        let split = SplitText.create("#descrip", {
+                            type: "words"
+                        });
+                        gsap.from(split.words, {
+                            y: 30,
+                            autoAlpha: 0,
+                            stagger: 0.06, 
+                        });
+                    }
+                };
 
-            gsap.to(valor, {
-                opacity: 2,
-                y: 0,
-                duration: 1,
-                scrollTrigger: {
-                    trigger: valor,
-                    start: "top 80%",
-                    end: "top 20%",
-                    toggleActions: "play none none reverse",
-                    scrub: 1,
-                },
-                delay: index * 0.2 // Añadir delay secuencial
-            });
+                // Animar valores izquierdos
+                const valsIzq = document.querySelectorAll('#izquierda .split');
+                valsIzq.forEach((val, index) => {
+                    gsap.set(val, { opacity: 1 });
+                    let split = SplitText.create(val, {
+                        type: "words,lines",
+                        linesClass: "line",
+                        autoSplit: true,
+                        mask: "lines",
+                        onSplit: (self) => {
+                            return gsap.from(self.lines, {
+                                duration: 0.2,
+                                xPercent: -10,
+                                opacity: 0,
+                                stagger: 0.1,
+                                ease: "expo.out",
+                                delay: index * 0.2,
+                                onComplete: () => {
+                                    completedAnimations++;
+                                    animateDescription();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // Animar valores derechos
+                const valsDer = document.querySelectorAll('#derecha .split');
+                valsDer.forEach((val, index) => {
+                    gsap.set(val, { opacity: 1 });
+                    let split = SplitText.create(val, {
+                        type: "words,lines",
+                        linesClass: "line",
+                        autoSplit: true,
+                        mask: "lines",
+                        onSplit: (self) => {
+                            return gsap.from(self.lines, {
+                                duration: 0.6,
+                                xPercent: 100,
+                                opacity: 0,
+                                stagger: 0.1,
+                                ease: "expo.out",
+                                delay: index * 0.8,
+                                onComplete: () => {
+                                    completedAnimations++;
+                                    animateDescription();
+                                }
+                            });
+                        }
+                    });
+                });
+            }
         });
-
-        // Animar el logo
-        const logo = document.querySelector('#logoContainer');
-        if (logo) {
-            gsap.from(logo, {
-                scale: 0.8,
-                opacity: 0.5,
-                duration: 1.5,
-                scrollTrigger: {
-                    trigger: logo,
-                    start: "top center",
-                    end: "bottom center",
-                    scrub: true
-                }
-            });
-        }
-    };
-
-    // Inicializar cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAnimations);
-    } else {
-        initAnimations();
     }
 </script>
 
 <style>
     .valor {
         will-change: transform;
+        opacity: 0;
+    }
+
+    .descripcion {
+        opacity: 0;
+        word-break: keep-all;
+        white-space: normal;
     }
 </style>
